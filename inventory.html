@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory - Antiques Manager</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4e5c80;
+            --primary-light: #7c8cb6;
+            --secondary: #b68e5c;
+            --dark: #333;
+            --light: #f5f5f5;
+            --success: #4caf50;
+            --warning: #ff9800;
+            --danger: #f44336;
+            --gray: #9e9e9e;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--light);
+            color: var(--dark);
+            line-height: 1.6;
+        }
+        
+        header {
+            background-color: var(--primary);
+            color: white;
+            padding: 1rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 100;
+        }
+        
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo i {
+            margin-right: 10px;
+        }
+        
+        .nav-links {
+            display: flex;
+        }
+        
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            margin: 0 0.2rem;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        
+        .nav-links a:hover, .nav-links a.active {
+            background-color: var(--primary-light);
+        }
+        
+        main {
+            max-width: 1200px;
+            margin: 80px auto 2rem;
+            padding: 1rem;
+        }
+        
+        h1 {
+            margin-bottom: 1.5rem;
+            color: var(--primary);
+            border-bottom: 2px solid var(--secondary);
+            padding-bottom: 0.5rem;
+        }
+        
+        .inventory-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .filter-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .search-container {
+            display: flex;
+            background-color: white;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            overflow: hidden;
+        }
+        
+        .search-input {
+            border: none;
+            padding: 0.5rem 1rem;
+            width: 250px;
+            outline: none;
+        }
+        
+        .search-btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+        }
+        
+        .status-filter {
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 0.5rem;
+            min-width: 120px;
+        }
+        
+        .add-btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+        
+        .add-btn i {
+            margin-right: 0.5rem;
+        }
+        
+        .add-btn:hover {
+            background-color: var(--primary-light);
+        }
+        
+        .inventory-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .item-card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .item-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .item-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+        
+        .item-body {
+            padding: 1rem;
+        }
+        
+        .item-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .item-period {
+            color: var(--secondary);
+            font-style: italic;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .item-price {
+            font-weight: bold;
+            color: var(--success);
+            margin-bottom: 1rem;
+        }
+        
+        .item-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 1rem;
+            background-color: #f9f9f9;
+            border-top: 1px solid #eee;
+        }
+        
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+        
+        .status-listed {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+        }
+        
+        .status-draft {
+            background-color: #f5f5f5;
+            color: #616161;
+        }
+        
+        .status-sold {
+            background-color: #e3f2fd;
+            color: #1565c0;
+        }
+        
+        .item-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .action-btn {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            color: var(--gray);
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+        
+        .action-btn:hover {
+            color: var(--primary);
+        }
+        
+        .delete-btn:hover {
+            color: var(--danger);
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .empty-state i {
+            font-size: 4rem;
+            color: var(--gray);
+            margin-bottom: 1rem;
+        }
+        
+        .empty-state h2 {
+            color: var(--dark);
+            margin-bottom: 1rem;
+        }
+        
+        .empty-state p {
+            color: var(--gray);
+            margin-bottom: 1.5rem;
+        }
+        
+        .modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            display: none;
+        }
+        
+        .modal {
+            background-color: white;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+        }
+        
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-header h2 {
+            color: var(--primary);
+        }
+        
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--gray);
+            cursor: pointer;
+        }
+        
+        .modal-body {
+            padding: 1.5rem;
+        }
+        
+        .modal-footer {
+            padding: 1.5rem;
+            border-top: 1px solid #eee;
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+        }
+        
+        .cancel-btn {
+            background-color: white;
+            color: var(--dark);
+            border: 1px solid #ddd;
+            padding: 0.75rem 1.5rem;
+            border-radius: 4px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        .confirm-btn {
+            background-color: var(--danger);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 4px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .inventory-header {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 1rem;
+            }
+            
+            .filter-container {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .search-container {
+                width: 100%;
+            }
+            
+            .search-input {
+                width: 100%;
+            }
+            
+            .status-filter {
+                width: 100%;
+            }
+            
+            .nav-links {
+                display: none;
+                flex-direction: column;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                width: 100%;
+                background-color: var(--primary);
+                padding: 1rem;
+            }
+            
+            .nav-links.show {
+                display: flex;
+            }
+            
+            .menu-toggle {
+                display: block;
+                background: none;
+                border: none;
+                color: white;
+                font-size: 1.5rem;
+                cursor: pointer;
+            }
+        }
+        
+        @media (min-width: 769px) {
+            .menu-toggle {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">
+                <i class="fas fa-bookmark"></i>
+                <span>Antiques Manager</span>
+            </div>
+            <button class="menu-toggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="nav-links">
+                <a href="index.html">Dashboard</a>
+                <a href="add-item.html">Add Item</a>
+                <a href="inventory.html" class="active">Inventory</a>
+                <a href="marketplace.html">Sell</a>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <h1>Inventory</h1>
+        
+        <div class="inventory-header">
+            <div class="filter-container">
+                <div class="search-container">
+                    <input type="text" class="search-input" id="search-input" placeholder="Search items...">
+                    <button class="search-btn">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+                
+                <select class="status-filter" id="status-filter">
+                    <option value="all">All Status</option>
+                    <option value="Draft">Draft</option>
+                    <option value="Listed">Listed</option>
+                    <option value="Sold">Sold</option>
+                </select>
+            </div>
+            
+            <button class="add-btn" onclick="window.location.href='add-item.html'">
+                <i class="fas fa-plus"></i>
+                Add New Item
+            </button>
+        </div>
+        
+        <div id="inventory-content">
+            <!-- Content will be loaded dynamically -->
+        </div>
+    </main>
+    
+    <!-- Delete Confirmation Modal -->
+    <div class="modal-backdrop" id="delete-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>Confirm Delete</h2>
+                <button class="close-modal" id="close-delete-modal">×</button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete this item? This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="cancel-btn" id="cancel-delete">Cancel</button>
+                <button class="confirm-btn" id="confirm-delete">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Toggle mobile menu
+        document.querySelector('.menu-toggle').addEventListener('click', function() {
+            document.querySelector('.nav-links').classList.toggle('show');
+        });
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            loadInventory();
+            setupEventListeners();
+        });
+        
+        let currentItems = [];
+        let deleteItemIndex = -1;
+        
+        function setupEventListeners() {
+            // Search functionality
+            document.getElementById('search-input').addEventListener('input', function() {
+                filterInventory();
+            });
+            
+            // Status filter
+            document.getElementById('status-filter').addEventListener('change', function() {
+                filterInventory();
+            });
+            
+            // Delete modal controls
+            document.getElementById('close-delete-modal').addEventListener('click', closeDeleteModal);
+            document.getElementById('cancel-delete').addEventListener('click', closeDeleteModal);
+            document.getElementById('confirm-delete').addEventListener('click', confirmDelete);
+        }
+        
+        function loadInventory() {
+            // Get items from localStorage
+            const items = JSON.parse(localStorage.getItem('antiqueItems')) || [];
+            currentItems = items;
+            
+            renderInventory(items);
+        }
+        
+        function renderInventory(items) {
+            const inventoryContent = document.getElementById('inventory-content');
+            
+            if (items.length === 0) {
+                // Show empty state
+                inventoryContent.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-box-open"></i>
+                        <h2>No items in your inventory</h2>
+                        <p>Start by adding your first antique item</p>
+                        <button class="add-btn" onclick="window.location.href='add-item.html'">
+                            <i class="fas fa-plus"></i>
+                            Add New Item
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Create grid for items
+            const inventoryGrid = document.createElement('div');
+            inventoryGrid.className = 'inventory-grid';
+            
+            // Add items to grid
+            items.forEach((item, index) => {
+                const itemCard = createItemCard(item, index);
+                inventoryGrid.appendChild(itemCard);
+            });
+            
+            // Replace content
+            inventoryContent.innerHTML = '';
+            inventoryContent.appendChild(inventoryGrid);
+        }
+        
+        function createItemCard(item, index) {
+            const card = document.createElement('div');
+            card.className = 'item-card';
+            
+            // Get status badge class
+            const getStatusClass = (status) => {
+                switch(status) {
+                    case 'Listed': return 'status-listed';
+                    case 'Draft': return 'status-draft';
+                    case 'Sold': return 'status-sold';
+                    default: return 'status-draft';
+                }
+            };
+            
+            // Create card content
+            card.innerHTML = `
+                <img src="${item.imageUrl}" alt="${item.name}" class="item-image">
+                <div class="item-body">
+                    <div class="item-title">${item.name}</div>
+                    <div class="item-period">${item.historicalPeriod}</div>
+                    <div class="item-price">$${parseFloat(item.estimatedValue).toLocaleString()}</div>
+                </div>
+                <div class="item-footer">
+                    <span class="status-badge ${getStatusClass(item.status)}">${item.status || 'Draft'}</span>
+                    <div class="item-actions">
+                        <button class="action-btn view-btn" data-index="${index}">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="action-btn edit-btn" data-index="${index}">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="action-btn delete-btn" data-index="${index}">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            // Add event listeners
+            setTimeout(() => {
+                card.querySelector('.view-btn').addEventListener('click', function() {
+                    const index = this.getAttribute('data-index');
+                    viewItem(index);
+                });
+                
+                card.querySelector('.edit-btn').addEventListener('click', function() {
+                    const index = this.getAttribute('data-index');
+                    editItem(index);
+                });
+                
+                card.querySelector('.delete-btn').addEventListener('click', function() {
+                    const index = this.getAttribute('data-index');
+                    openDeleteModal(index);
+                });
+            }, 0);
+            
+            return card;
+        }
+        
+        function filterInventory() {
+            const searchText = document.getElementById('search-input').value.toLowerCase();
+            const statusFilter = document.getElementById('status-filter').value;
+            
+            // Get all items
+            const allItems = JSON.parse(localStorage.getItem('antiqueItems')) || [];
+            
+            // Filter items
+            const filteredItems = allItems.filter(item => {
+                // Status filter
+                if (statusFilter !== 'all' && item.status !== statusFilter) {
+                    return false;
+                }
+                
+                // Search text filter
+                if (searchText) {
+                    const nameMatch = item.name.toLowerCase().includes(searchText);
+                    const descriptionMatch = item.description.toLowerCase().includes(searchText);
+                    const periodMatch = item.historicalPeriod.toLowerCase().includes(searchText);
+                    const tagsMatch = item.tags && item.tags.some(tag => tag.toLowerCase().includes(searchText));
+                    
+                    return nameMatch || descriptionMatch || periodMatch || tagsMatch;
+                }
+                
+                return true;
+            });
+            
+            currentItems = filteredItems;
+            renderInventory(filteredItems);
+        }
+        
+        function viewItem(index) {
+            const item = currentItems[index];
+            
+            // In a real app, you would redirect to a details page with the item's ID
+            // For this demo, we'll just alert the item details
+            alert(`Viewing item: ${item.name}`);
+            
+            // Redirect to a details page (would be implemented in a real app)
+            // window.location.href = `item-details.html?id=${index}`;
+        }
+        
+        function editItem(index) {
+            const item = currentItems[index];
+            
+            // In a real app, you would redirect to an edit page with the item's ID
+            // For this demo, we'll just alert
+            alert(`Editing item: ${item.name} (In a real app, this would open an edit form)`);
+        }
+        
+        function openDeleteModal(index) {
+            deleteItemIndex = index;
+            document.getElementById('delete-modal').style.display = 'flex';
+        }
+        
+        function closeDeleteModal() {
+            document.getElementById('delete-modal').style.display = 'none';
+            deleteItemIndex = -1;
+        }
+        
+        function confirmDelete() {
+            if (deleteItemIndex === -1) return;
+            
+            // Get all items
+            const allItems = JSON.parse(localStorage.getItem('antiqueItems')) || [];
+            
+            // Find the actual index in the allItems array
+            const currentItem = currentItems[deleteItemIndex];
+            const realIndex = allItems.findIndex(item => 
+                item.name === currentItem.name && 
+                item.dateAdded === currentItem.dateAdded
+            );
+            
+            // Remove the item
+            if (realIndex !== -1) {
+                allItems.splice(realIndex, 1);
+                localStorage.setItem('antiqueItems', JSON.stringify(allItems));
+            }
+            
+            // Close modal
+            closeDeleteModal();
+            
+            // Reload inventory
+            filterInventory();
+        }
+    </script>
+</body>
+</html>

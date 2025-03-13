@@ -1,0 +1,1127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marketplace - Antiques Manager</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4e5c80;
+            --primary-light: #7c8cb6;
+            --secondary: #b68e5c;
+            --dark: #333;
+            --light: #f5f5f5;
+            --success: #4caf50;
+            --warning: #ff9800;
+            --danger: #f44336;
+            --gray: #9e9e9e;
+            --ebay: #e53238;
+            --facebook: #1877f2;
+            --etsy: #f27935;
+            --craigslist: #551A8B;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--light);
+            color: var(--dark);
+            line-height: 1.6;
+        }
+        
+        header {
+            background-color: var(--primary);
+            color: white;
+            padding: 1rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 100;
+        }
+        
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo i {
+            margin-right: 10px;
+        }
+        
+        .nav-links {
+            display: flex;
+        }
+        
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            margin: 0 0.2rem;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        
+        .nav-links a:hover, .nav-links a.active {
+            background-color: var(--primary-light);
+        }
+        
+        main {
+            max-width: 1200px;
+            margin: 80px auto 2rem;
+            padding: 1rem;
+        }
+        
+        h1 {
+            margin-bottom: 1.5rem;
+            color: var(--primary);
+            border-bottom: 2px solid var(--secondary);
+            padding-bottom: 0.5rem;
+        }
+        
+        .tab-container {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .tabs {
+            display: flex;
+            background-color: #f5f7fa;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .tab {
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+        }
+        
+        .tab.active {
+            background-color: white;
+            border-bottom-color: var(--primary);
+            color: var(--primary);
+        }
+        
+        .tab-content {
+            padding: 1.5rem;
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* Marketplace Icons */
+        .marketplace-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .marketplace-card {
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            padding: 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            border: 2px solid transparent;
+        }
+        
+        .marketplace-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .marketplace-card.selected {
+            border-color: var(--primary);
+            background-color: #f0f4fc;
+        }
+        
+        .marketplace-card i {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .marketplace-card h3 {
+            margin-bottom: 0.5rem;
+        }
+        
+        .marketplace-card p {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+        
+        .ebay-color {
+            color: var(--ebay);
+        }
+        
+        .facebook-color {
+            color: var(--facebook);
+        }
+        
+        .etsy-color {
+            color: var(--etsy);
+        }
+        
+        .craigslist-color {
+            color: var(--craigslist);
+        }
+        
+        /* Item Selection */
+        .items-table-container {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+        }
+        
+        .items-header {
+            background-color: #f5f7fa;
+            padding: 1rem;
+            border-bottom: 1px solid #eee;
+            font-weight: 600;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        th {
+            background-color: #f5f7fa;
+            font-weight: 600;
+            color: var(--gray);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        tbody tr:hover {
+            background-color: #f9f9f9;
+        }
+        
+        .checkbox-cell {
+            width: 40px;
+            text-align: center;
+        }
+        
+        .image-cell {
+            width: 80px;
+        }
+        
+        .item-image-small {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+        
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+        
+        .status-listed {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+        }
+        
+        .status-draft {
+            background-color: #f5f5f5;
+            color: #616161;
+        }
+        
+        .status-sold {
+            background-color: #e3f2fd;
+            color: #1565c0;
+        }
+        
+        /* Listing Options */
+        .listing-options {
+            background-color: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 1.5rem;
+        }
+        
+        .option-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .option-group:last-child {
+            margin-bottom: 0;
+        }
+        
+        .option-group h3 {
+            margin-bottom: 1rem;
+            color: var(--primary);
+            font-size: 1.1rem;
+        }
+        
+        .option-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        input, textarea, select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        
+        .option-checkbox {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+        
+        .option-checkbox input {
+            width: auto;
+            margin-right: 0.5rem;
+        }
+        
+        .listing-preview {
+            background-color: #f9f9f9;
+            border: 1px dashed #ddd;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+        }
+        
+        .preview-header {
+            margin-bottom: 1rem;
+            color: var(--gray);
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .multi-listing-btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-top: 1.5rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.3s;
+        }
+        
+        .multi-listing-btn i {
+            margin-right: 0.5rem;
+        }
+        
+        .multi-listing-btn:hover {
+            background-color: var(--primary-light);
+        }
+        
+        /* Active Listings */
+        .listings-table-container {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .platform-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-right: 0.5rem;
+        }
+        
+        .platform-badge i {
+            margin-right: 0.25rem;
+        }
+        
+        .ebay-badge {
+            background-color: #fceef0;
+            color: var(--ebay);
+        }
+        
+        .facebook-badge {
+            background-color: #e8f4fe;
+            color: var(--facebook);
+        }
+        
+        .etsy-badge {
+            background-color: #fdf3ed;
+            color: var(--etsy);
+        }
+        
+        .craigslist-badge {
+            background-color: #f0e6f6;
+            color: var(--craigslist);
+        }
+        
+        .listing-link {
+            color: var(--primary);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+        }
+        
+        .listing-link i {
+            margin-left: 0.25rem;
+            font-size: 0.8rem;
+        }
+        
+        .action-btn {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            color: var(--gray);
+            cursor: pointer;
+            transition: color 0.3s;
+            margin-right: 0.5rem;
+        }
+        
+        .action-btn:hover {
+            color: var(--primary);
+        }
+        
+        .refresh-btn:hover {
+            color: var(--success);
+        }
+        
+        .delete-btn:hover {
+            color: var(--danger);
+        }
+        
+        /* Empty States */
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+        }
+        
+        .empty-state i {
+            font-size: 4rem;
+            color: var(--gray);
+            margin-bottom: 1rem;
+        }
+        
+        .empty-state h3 {
+            color: var(--dark);
+            margin-bottom: 0.5rem;
+        }
+        
+        .empty-state p {
+            color: var(--gray);
+            margin-bottom: 1.5rem;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        /* Modal */
+        .modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            display: none;
+        }
+        
+        .modal {
+            background-color: white;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+        }
+        
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-header h2 {
+            color: var(--primary);
+        }
+        
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--gray);
+            cursor: pointer;
+        }
+        
+        .modal-body {
+            padding: 1.5rem;
+        }
+        
+        .success-message {
+            text-align: center;
+        }
+        
+        .success-message i {
+            font-size: 4rem;
+            color: var(--success);
+            margin-bottom: 1rem;
+        }
+        
+        .success-message h3 {
+            color: var(--dark);
+            margin-bottom: 1rem;
+        }
+        
+        .success-message p {
+            color: var(--gray);
+            margin-bottom: 1.5rem;
+        }
+        
+        .platform-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            justify-content: center;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .tabs {
+                flex-wrap: wrap;
+            }
+            
+            .tab {
+                flex: 1 0 50%;
+                text-align: center;
+            }
+            
+            .marketplace-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .nav-links {
+                display: none;
+                flex-direction: column;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                width: 100%;
+                background-color: var(--primary);
+                padding: 1rem;
+            }
+            
+            .nav-links.show {
+                display: flex;
+            }
+            
+            .menu-toggle {
+                display: block;
+                background: none;
+                border: none;
+                color: white;
+                font-size: 1.5rem;
+                cursor: pointer;
+            }
+            
+            /* Hide less important table columns on mobile */
+            .hide-mobile {
+                display: none;
+            }
+        }
+        
+        @media (min-width: 769px) {
+            .menu-toggle {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">
+                <i class="fas fa-bookmark"></i>
+                <span>Antiques Manager</span>
+            </div>
+            <button class="menu-toggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="nav-links">
+                <a href="index.html">Dashboard</a>
+                <a href="add-item.html">Add Item</a>
+                <a href="inventory.html">Inventory</a>
+                <a href="marketplace.html" class="active">Sell</a>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <h1>Marketplace Manager</h1>
+        
+        <div class="tab-container">
+            <div class="tabs">
+                <div class="tab active" data-tab="create-listing">Create Listing</div>
+                <div class="tab" data-tab="active-listings">Active Listings</div>
+                <div class="tab" data-tab="sold-items">Sold Items</div>
+                <div class="tab" data-tab="analytics">Analytics</div>
+            </div>
+            
+            <!-- Create Listing Tab -->
+            <div class="tab-content active" id="create-listing">
+                <h2>Select Marketplace Platforms</h2>
+                <p>Choose where you want to list your antique items for sale:</p>
+                
+                <div class="marketplace-grid">
+                    <div class="marketplace-card" data-platform="ebay">
+                        <i class="fab fa-ebay ebay-color"></i>
+                        <h3>eBay</h3>
+                        <p>Reach millions of buyers worldwide with the largest online marketplace for antiques</p>
+                    </div>
+                    
+                    <div class="marketplace-card" data-platform="facebook">
+                        <i class="fab fa-facebook facebook-color"></i>
+                        <h3>Facebook Marketplace</h3>
+                        <p>Connect with local buyers and sell without shipping fees</p>
+                    </div>
+                    
+                    <div class="marketplace-card" data-platform="etsy">
+                        <i class="fab fa-etsy etsy-color"></i>
+                        <h3>Etsy</h3>
+                        <p>Perfect for vintage items and collectibles to reach targeted buyers</p>
+                    </div>
+                    
+                    <div class="marketplace-card" data-platform="craigslist">
+                        <i class="fas fa-list craigslist-color"></i>
+                        <h3>Craigslist</h3>
+                        <p>Free local classified ads with no selling fees</p>
+                    </div>
+                </div>
+                
+                <h2>Select Items to List</h2>
+                <div class="items-table-container">
+                    <div class="items-header">
+                        Select from your inventory (only unlisted items are shown)
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th class="checkbox-cell">
+                                    <input type="checkbox" id="select-all">
+                                </th>
+                                <th class="image-cell">IMAGE</th>
+                                <th>ITEM</th>
+                                <th class="hide-mobile">PERIOD</th>
+                                <th>PRICE</th>
+                                <th>STATUS</th>
+                            </tr>
+                        </thead>
+                        <tbody id="items-table-body">
+                            <!-- Items will be loaded dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div id="listing-options-container" style="display: none;">
+                    <h2>Listing Options</h2>
+                    <div class="listing-options">
+                        <div class="option-group">
+                            <h3>Pricing</h3>
+                            <div class="option-row">
+                                <div>
+                                    <label for="listing-price">Listing Price ($)</label>
+                                    <input type="number" id="listing-price" min="0" step="0.01">
+                                </div>
+                                <div>
+                                    <label for="price-type">Price Type</label>
+                                    <select id="price-type">
+                                        <option value="fixed">Fixed Price</option>
+                                        <option value="auction">Auction (eBay only)</option>
+                                        <option value="best-offer">Fixed with Best Offer</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="option-group">
+                            <h3>Shipping</h3>
+                            <div class="option-row">
+                                <div>
+                                    <label for="shipping-option">Shipping Option</label>
+                                    <select id="shipping-option">
+                                        <option value="flat-rate">Flat Rate</option>
+                                        <option value="calculated">Calculated by Weight/Size</option>
+                                        <option value="free">Free Shipping</option>
+                                        <option value="local-pickup">Local Pickup Only</option>
+                                    </select>
+                                </div>
+                                <div id="shipping-cost-container">
+                                    <label for="shipping-cost">Shipping Cost ($)</label>
+                                    <input type="number" id="shipping-cost" min="0" step="0.01">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="option-group">
+                            <h3>Additional Options</h3>
+                            <div class="option-checkbox">
+                                <input type="checkbox" id="use-description" checked>
+                                <label for="use-description">Use item description from inventory</label>
+                            </div>
+                            <div class="option-checkbox">
+                                <input type="checkbox" id="include-all-images" checked>
+                                <label for="include-all-images">Include all item images</label>
+                            </div>
+                            <div class="option-checkbox">
+                                <input type="checkbox" id="sync-listings">
+                                <label for="sync-listings">Keep listing details in sync across platforms</label>
+                            </div>
+                        </div>
+                        
+                        <div class="listing-preview">
+                            <div class="preview-header">PREVIEW</div>
+                            <p>Your listing will include detailed item information, all uploaded images, and your selected pricing and shipping options.</p>
+                        </div>
+                    </div>
+                    
+                    <button class="multi-listing-btn" id="create-listings-btn">
+                        <i class="fas fa-globe"></i>
+                        Create Listings on Selected Platforms
+                    </button>
+                </div>
+                
+                <div id="no-items-message" class="empty-state" style="display: none;">
+                    <i class="fas fa-box-open"></i>
+                    <h3>No items available for listing</h3>
+                    <p>You don't have any unlisted items in your inventory. Add some items first!</p>
+                    <button class="add-btn" onclick="window.location.href='add-item.html'">
+                        <i class="fas fa-plus"></i>
+                        Add New Item
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Active Listings Tab -->
+            <div class="tab-content" id="active-listings">
+                <div class="listings-table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th class="image-cell">IMAGE</th>
+                                <th>ITEM</th>
+                                <th>PLATFORMS</th>
+                                <th>PRICE</th>
+                                <th class="hide-mobile">LISTED DATE</th>
+                                <th>ACTIONS</th>
+                            </tr>
+                        </thead>
+                        <tbody id="listings-table-body">
+                            <!-- Listings will be loaded dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div id="no-listings-message" class="empty-state" style="display: none;">
+                    <i class="fas fa-store"></i>
+                    <h3>No active listings</h3>
+                    <p>You don't have any items currently listed for sale. Create a listing to start selling!</p>
+                </div>
+            </div>
+            
+            <!-- Sold Items Tab -->
+            <div class="tab-content" id="sold-items">
+                <div class="empty-state">
+                    <i class="fas fa-money-bill-wave"></i>
+                    <h3>No sold items yet</h3>
+                    <p>When you sell items, they will appear here with detailed sale information.</p>
+                </div>
+            </div>
+            
+            <!-- Analytics Tab -->
+            <div class="tab-content" id="analytics">
+                <div class="empty-state">
+                    <i class="fas fa-chart-line"></i>
+                    <h3>Analytics Dashboard</h3>
+                    <p>Track your sales performance, view statistics, and optimize your listings. This feature will be available once you have active listings and sales.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Success Modal -->
+    <div class="modal-backdrop" id="success-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>Listings Created</h2>
+                <button class="close-modal" id="close-success-modal">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="success-message">
+                    <i class="fas fa-check-circle"></i>
+                    <h3>Your items have been listed successfully!</h3>
+                    <p>Your items are now listed on the following platforms:</p>
+                    <div class="platform-list" id="success-platform-list">
+                        <!-- Platforms will be added here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Toggle mobile menu
+        document.querySelector('.menu-toggle').addEventListener('click', function() {
+            document.querySelector('.nav-links').classList.toggle('show');
+        });
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            setupTabs();
+            setupMarketplaceSelection();
+            loadItems();
+            loadListings();
+            setupListingOptions();
+            
+            // Setup checkbox functionality
+            document.getElementById('select-all').addEventListener('change', function() {
+                const checkboxes = document.querySelectorAll('tbody input[type="checkbox"]');
+                checkboxes.forEach(checkbox => {
+                    checkbox.checked = this.checked;
+                });
+                updateListingOptionsVisibility();
+            });
+            
+            // Setup modal close button
+            document.getElementById('close-success-modal').addEventListener('click', function() {
+                document.getElementById('success-modal').style.display = 'none';
+            });
+            
+            // Setup create listings button
+            document.getElementById('create-listings-btn').addEventListener('click', createListings);
+        });
+        
+        let selectedPlatforms = [];
+        
+        function setupTabs() {
+            const tabs = document.querySelectorAll('.tab');
+            
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    // Remove active class from all tabs and content
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                    
+                    // Add active class to clicked tab
+                    this.classList.add('active');
+                    
+                    // Show corresponding content
+                    const tabId = this.getAttribute('data-tab');
+                    document.getElementById(tabId).classList.add('active');
+                });
+            });
+        }
+        
+        function setupMarketplaceSelection() {
+            const marketplaceCards = document.querySelectorAll('.marketplace-card');
+            
+            marketplaceCards.forEach(card => {
+                card.addEventListener('click', function() {
+                    const platform = this.getAttribute('data-platform');
+                    
+                    if (this.classList.contains('selected')) {
+                        // Remove from selected
+                        this.classList.remove('selected');
+                        selectedPlatforms = selectedPlatforms.filter(p => p !== platform);
+                    } else {
+                        // Add to selected
+                        this.classList.add('selected');
+                        selectedPlatforms.push(platform);
+                    }
+                });
+            });
+        }
+        
+        function loadItems() {
+            // Get items from localStorage
+            const items = JSON.parse(localStorage.getItem('antiqueItems')) || [];
+            
+            // Filter for unlisted items (status is not 'Listed')
+            const unlistedItems = items.filter(item => item.status !== 'Listed');
+            
+            const tableBody = document.getElementById('items-table-body');
+            const noItemsMessage = document.getElementById('no-items-message');
+            
+            if (unlistedItems.length === 0) {
+                tableBody.innerHTML = '';
+                noItemsMessage.style.display = 'block';
+                return;
+            }
+            
+            noItemsMessage.style.display = 'none';
+            tableBody.innerHTML = '';
+            
+            unlistedItems.forEach((item, index) => {
+                const row = document.createElement('tr');
+                
+                const getStatusClass = (status) => {
+                    switch(status) {
+                        case 'Listed': return 'status-listed';
+                        case 'Draft': return 'status-draft';
+                        case 'Sold': return 'status-sold';
+                        default: return 'status-draft';
+                    }
+                };
+                
+                row.innerHTML = `
+                    <td class="checkbox-cell">
+                        <input type="checkbox" class="item-checkbox" data-index="${index}">
+                    </td>
+                    <td class="image-cell">
+                        <img src="${item.imageUrl}" alt="${item.name}" class="item-image-small">
+                    </td>
+                    <td>${item.name}</td>
+                    <td class="hide-mobile">${item.historicalPeriod}</td>
+                    <td>$${parseFloat(item.estimatedValue).toLocaleString()}</td>
+                    <td><span class="status-badge ${getStatusClass(item.status)}">${item.status || 'Draft'}</span></td>
+                `;
+                
+                tableBody.appendChild(row);
+            });
+            
+            // Add change event to checkboxes
+            document.querySelectorAll('.item-checkbox').forEach(checkbox => {
+                checkbox.addEventListener('change', updateListingOptionsVisibility);
+            });
+        }
+        
+        function updateListingOptionsVisibility() {
+            const anyChecked = document.querySelector('.item-checkbox:checked');
+            const listingOptionsContainer = document.getElementById('listing-options-container');
+            
+            if (anyChecked) {
+                listingOptionsContainer.style.display = 'block';
+                
+                // Update the listing price with the value of the first selected item
+                const firstCheckedBox = document.querySelector('.item-checkbox:checked');
+                if (firstCheckedBox) {
+                    const index = parseInt(firstCheckedBox.getAttribute('data-index'));
+                    const items = JSON.parse(localStorage.getItem('antiqueItems')) || [];
+                    
+                    if (items[index]) {
+                        document.getElementById('listing-price').value = items[index].estimatedValue;
+                    }
+                }
+            } else {
+                listingOptionsContainer.style.display = 'none';
+            }
+        }
+        
+        function setupListingOptions() {
+            // Show/hide shipping cost based on shipping option
+            document.getElementById('shipping-option').addEventListener('change', function() {
+                const shippingCostContainer = document.getElementById('shipping-cost-container');
+                shippingCostContainer.style.display = (this.value === 'flat-rate') ? 'block' : 'none';
+            });
+        }
+        
+        function loadListings() {
+            // Get items from localStorage
+            const items = JSON.parse(localStorage.getItem('antiqueItems')) || [];
+            
+            // Filter for listed items
+            const listedItems = items.filter(item => item.status === 'Listed');
+            
+            const tableBody = document.getElementById('listings-table-body');
+            const noListingsMessage = document.getElementById('no-listings-message');
+            
+            if (listedItems.length === 0) {
+                tableBody.innerHTML = '';
+                noListingsMessage.style.display = 'block';
+                return;
+            }
+            
+            noListingsMessage.style.display = 'none';
+            tableBody.innerHTML = '';
+            
+            listedItems.forEach((item, index) => {
+                const row = document.createElement('tr');
+                
+                // Mock platforms for this demo
+                const platforms = item.platforms || ['ebay', 'facebook'];
+                const platformBadges = platforms.map(platform => {
+                    const icons = {
+                        'ebay': 'fab fa-ebay',
+                        'facebook': 'fab fa-facebook',
+                        'etsy': 'fab fa-etsy',
+                        'craigslist': 'fas fa-list'
+                    };
+                    
+                    return `<span class="platform-badge ${platform}-badge"><i class="${icons[platform]}"></i> ${platform.charAt(0).toUpperCase() + platform.slice(1)}</span>`;
+                }).join('');
+                
+                const mockDate = new Date();
+                mockDate.setDate(mockDate.getDate() - Math.floor(Math.random() * 14)); // Random date in the last 14 days
+                
+                row.innerHTML = `
+                    <td class="image-cell">
+                        <img src="${item.imageUrl}" alt="${item.name}" class="item-image-small">
+                    </td>
+                    <td>${item.name}</td>
+                    <td>${platformBadges}</td>
+                    <td>$${parseFloat(item.listingPrice || item.estimatedValue).toLocaleString()}</td>
+                    <td class="hide-mobile">${mockDate.toLocaleDateString()}</td>
+                    <td>
+                        <button class="action-btn view-btn" title="View Listing">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="action-btn refresh-btn" title="Refresh Listing">
+                            <i class="fas fa-sync"></i>
+                        </button>
+                        <button class="action-btn delete-btn" title="End Listing">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </td>
+                `;
+                
+                tableBody.appendChild(row);
+            });
+        }
+        
+        function createListings() {
+            if (selectedPlatforms.length === 0) {
+                alert('Please select at least one marketplace platform');
+                return;
+            }
+            
+            const selectedItems = [];
+            document.querySelectorAll('.item-checkbox:checked').forEach(checkbox => {
+                const index = parseInt(checkbox.getAttribute('data-index'));
+                selectedItems.push(index);
+            });
+            
+            if (selectedItems.length === 0) {
+                alert('Please select at least one item to list');
+                return;
+            }
+            
+            // Get listing options
+            const listingPrice = document.getElementById('listing-price').value;
+            const priceType = document.getElementById('price-type').value;
+            const shippingOption = document.getElementById('shipping-option').value;
+            const shippingCost = document.getElementById('shipping-cost').value;
+            
+            // Validate
+            if (!listingPrice) {
+                alert('Please enter a listing price');
+                return;
+            }
+            
+            // In a real app, this would make API calls to the selected marketplaces
+            // For this demo, we'll simulate the listing process
+            
+            // Get items from localStorage
+            const items = JSON.parse(localStorage.getItem('antiqueItems')) || [];
+            
+            // Update selected items to 'Listed' status
+            selectedItems.forEach(index => {
+                const item = items[index];
+                if (item) {
+                    item.status = 'Listed';
+                    item.listingPrice = listingPrice;
+                    item.priceType = priceType;
+                    item.shippingOption = shippingOption;
+                    item.shippingCost = shippingCost;
+                    item.platforms = selectedPlatforms;
+                    item.listedDate = new Date().toISOString();
+                }
+            });
+            
+            // Save back to localStorage
+            localStorage.setItem('antiqueItems', JSON.stringify(items));
+            
+            // Show success message
+            showSuccessModal();
+            
+            // Reload items and listings
+            loadItems();
+            loadListings();
+        }
+        
+        function showSuccessModal() {
+            const platformList = document.getElementById('success-platform-list');
+            platformList.innerHTML = '';
+            
+            const platformIcons = {
+                'ebay': 'fab fa-ebay ebay-color',
+                'facebook': 'fab fa-facebook facebook-color',
+                'etsy': 'fab fa-etsy etsy-color',
+                'craigslist': 'fas fa-list craigslist-color'
+            };
+            
+            selectedPlatforms.forEach(platform => {
+                const badge = document.createElement('span');
+                badge.className = `platform-badge ${platform}-badge`;
+                badge.innerHTML = `<i class="${platformIcons[platform]}"></i> ${platform.charAt(0).toUpperCase() + platform.slice(1)}`;
+                platformList.appendChild(badge);
+            });
+            
+            document.getElementById('success-modal').style.display = 'flex';
+        }
+    </script>
+</body>
+</html>
